@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Bookstride",
+  "short_name": "Bookstride",
+  "description": "A reading room for classic books, original summaries and practical lessons.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#dbc196",
+  "theme_color": "#dbc196",
+  "icons": [
+    {"src": "assets/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

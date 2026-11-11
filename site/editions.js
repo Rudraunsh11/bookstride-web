@@ -1,0 +1,1 @@
+const hostedEditions = new Set();
