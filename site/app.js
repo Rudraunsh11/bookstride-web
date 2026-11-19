@@ -51,24 +51,24 @@ function applyTheme(value) {
 }
 
 function cover(book) {
-  return `<div class="cover ${book.id}${book.coverTone ? ` tone-${book.coverTone}` : ''}${book.title.length > 24 ? ' long-title' : ''}${book.title.split(/\s+/).some(word => word.length > 10) ? ' long-word' : ''}">
+  return `<div class="cover ${escapeText(book.id)}${book.coverTone ? ` tone-${escapeText(book.coverTone)}` : ''}${book.title.length > 24 ? ' long-title' : ''}${book.title.split(/\s+/).some(word => word.length > 10) ? ' long-word' : ''}">
     <span class="cover-corner top-left" aria-hidden="true">❧</span>
     <span class="cover-corner bottom-right" aria-hidden="true">❧</span>
     <span class="author">${escapeText(book.author)}</span>
-    <span class="decoration" aria-hidden="true">${book.symbol}</span>
+    <span class="decoration" aria-hidden="true">${escapeText(book.symbol)}</span>
     <span class="book-title">${escapeText(book.title)}</span>
-    <span class="edition">BOOKSTRIDE COLLECTION · ${book.year}</span>
+    <span class="edition">BOOKSTRIDE COLLECTION · ${escapeText(book.year)}</span>
   </div>`;
 }
 
 function card(book) {
   return `<article class="book">
-    <a class="cover-wrap" href="#book/${book.id}" aria-label="Explore ${escapeText(book.title)}">${cover(book)}<span class="shelf-edge" aria-hidden="true"></span></a>
-    <p class="category">${book.category}</p>
-    <h3><a href="#book/${book.id}">${escapeText(book.title)}</a></h3>
-    <p class="byline">${book.author}</p>
+    <a class="cover-wrap" href="#book/${escapeText(book.id)}" aria-label="Explore ${escapeText(book.title)}">${cover(book)}<span class="shelf-edge" aria-hidden="true"></span></a>
+    <p class="category">${escapeText(book.category)}</p>
+    <h3><a href="#book/${escapeText(book.id)}">${escapeText(book.title)}</a></h3>
+    <p class="byline">${escapeText(book.author)}</p>
     <div class="book-bottom"><span>${readingMinutes(book.sections)} min summary · ${hostedEditions.has(book.id) ? 'Read in app' : 'Source link'}</span>
-      <button class="bookmark" data-save="${book.id}" aria-label="${saved.has(book.id) ? 'Remove' : 'Save'} ${escapeText(book.title)}" aria-pressed="${saved.has(book.id)}">${saved.has(book.id) ? 'Remove from MyShelf' : 'Add to MyShelf'}</button>
+      <button class="bookmark" data-save="${escapeText(book.id)}" aria-label="${saved.has(book.id) ? 'Remove' : 'Save'} ${escapeText(book.title)}" aria-pressed="${saved.has(book.id)}">${saved.has(book.id) ? 'Remove from MyShelf' : 'Add to MyShelf'}</button>
     </div>
   </article>`;
 }
@@ -88,10 +88,10 @@ function library(shelf = false) {
   const view = libraryViews[shelf ? 'shelf' : 'library'];
   const genres = [...new Set(books.map(book => book.category))].sort();
   const featured = shelf ? null : chooseFeaturedBook();
-  const featuredCard = featured ? `<a class="feature" href="#book/${featured.id}" aria-label="Explore ${escapeText(featured.title)}">
+  const featuredCard = featured ? `<a class="feature" href="#book/${escapeText(featured.id)}" aria-label="Explore ${escapeText(featured.title)}">
     <span class="feature-label">A GOOD PLACE TO BEGIN</span>
     <div class="featured-niche">${cover(featured)}<span class="shelf-edge" aria-hidden="true"></span></div>
-    <h2>${featured.topic}</h2><p>Open ${featured.author}’s book <span aria-hidden="true">↗</span></p>
+    <h2>${escapeText(featured.topic)}</h2><p>Open ${escapeText(featured.author)}’s book <span aria-hidden="true">↗</span></p>
   </a>` : '';
   main.innerHTML = `${shelf ? '' : `<section class="hero">
     <div class="hero-intro"><span class="eyebrow">A LIBRARY TO LOSE YOURSELF IN</span>
@@ -141,16 +141,16 @@ function detail(book) {
   const hosted = hostedEditions.has(book.id);
   main.innerHTML = `<a class="back" href="#library">← Back to the library</a>
     <section class="detail"><div class="detail-book"><div class="cover-wrap">${cover(book)}<span class="shelf-edge" aria-hidden="true"></span></div><span class="edition-caption">An original Bookstride cover</span></div>
-    <div class="detail-copy"><span class="eyebrow">${book.category} · ${book.year}</span><h1>${escapeText(book.title)}</h1><p class="byline">by ${book.author}</p><p class="intro">${book.description}</p>
+    <div class="detail-copy"><span class="eyebrow">${escapeText(book.category)} · ${escapeText(book.year)}</span><h1>${escapeText(book.title)}</h1><p class="byline">by ${escapeText(book.author)}</p><p class="intro">${escapeText(book.description)}</p>
       <div class="choices">
-        <a class="choice" href="#summary/${book.id}"><div><strong>Get Summary</strong><span>${book.guideFormat === 'Overview' ? 'An overview' : 'A detailed guide'} in ${readingMinutes(book.sections)} minutes · Includes spoilers</span></div><i aria-hidden="true">↗</i></a>
-        <a class="choice" href="#lessons/${book.id}"><div><strong>Important Lessons</strong><span>${book.lessons.length} reflections, examples, and practical actions</span></div><i aria-hidden="true">↗</i></a>
-        <a class="choice" href="#read/${book.id}"><div><strong>${hosted ? progress ? 'Continue Full Book' : 'Read Full Book' : 'View Source Edition'}</strong><span>${hosted ? 'Read here · Section navigation · Place saved in this browser' : 'Opens the source catalogue with available reading formats'}</span></div><i aria-hidden="true">↗</i></a>
+        <a class="choice" href="#summary/${escapeText(book.id)}"><div><strong>Get Summary</strong><span>${book.guideFormat === 'Overview' ? 'An overview' : 'A detailed guide'} in ${readingMinutes(book.sections)} minutes · Includes spoilers</span></div><i aria-hidden="true">↗</i></a>
+        <a class="choice" href="#lessons/${escapeText(book.id)}"><div><strong>Important Lessons</strong><span>${book.lessons.length} reflections, examples, and practical actions</span></div><i aria-hidden="true">↗</i></a>
+        <a class="choice" href="#read/${escapeText(book.id)}"><div><strong>${hosted ? progress ? 'Continue Full Book' : 'Read Full Book' : 'View Source Edition'}</strong><span>${hosted ? 'Read here · Section navigation · Place saved in this browser' : 'Opens the source catalogue with available reading formats'}</span></div><i aria-hidden="true">↗</i></a>
       </div>
-      <div class="book-actions"><button class="secondary" data-save="${book.id}" aria-pressed="${saved.has(book.id)}">${saved.has(book.id) ? 'Remove from MyShelf' : 'Add to MyShelf'}</button>
-        ${hosted ? `<button class="secondary" type="button" data-offline-book="${book.id}" hidden>Save for offline reading</button>` : ''}</div>
+      <div class="book-actions"><button class="secondary" data-save="${escapeText(book.id)}" aria-pressed="${saved.has(book.id)}">${saved.has(book.id) ? 'Remove from MyShelf' : 'Add to MyShelf'}</button>
+        ${hosted ? `<button class="secondary" type="button" data-offline-book="${escapeText(book.id)}" hidden>Save for offline reading</button>` : ''}</div>
       <div id="offline-result" class="offline-result" role="status"></div>
-      <p class="reading-note">Summaries and lessons are original interpretations. <a href="https://www.gutenberg.org/ebooks/${book.source}" target="_blank" rel="noopener noreferrer">Original edition and notices ↗</a></p>
+      <p class="reading-note">Summaries and lessons are original interpretations. <a href="https://www.gutenberg.org/ebooks/${encodeURIComponent(book.source)}" target="_blank" rel="noopener noreferrer">Original edition and notices ↗</a></p>
     </div></section>`;
   refreshOfflineAction();
 }
@@ -169,10 +169,10 @@ function paragraphs(text) {
 function reader(book, lessons) {
   const sections = lessons ? book.lessons : book.sections;
   const anchorPrefix = lessons ? 'lesson' : 'guide';
-  main.innerHTML = `<div class="reading-topbar"><a class="reading-back" href="#book/${book.id}">← Back to book</a>${readerTools()}</div>
+  main.innerHTML = `<div class="reading-topbar"><a class="reading-back" href="#book/${escapeText(book.id)}">← Back to book</a>${readerTools()}</div>
     <article class="reader clean-reader"><p class="reading-label">${lessons ? 'Lessons' : 'Summary'} · ${readingMinutes(sections)} min read${lessons ? '' : ' · Spoilers'}</p>
       <h1>${escapeText(book.title)}</h1>
-      ${sections.map((section, index) => `<section class="${lessons ? 'lesson' : 'guide-section'}" id="${anchorPrefix}-${book.id}-${index}">
+      ${sections.map((section, index) => `<section class="${lessons ? 'lesson' : 'guide-section'}" id="${anchorPrefix}-${escapeText(book.id)}-${index}">
         <h2>${escapeText(section[0])}</h2>${paragraphs(section[1])}
         ${lessons ? `<p class="lesson-practice"><strong>Try this:</strong> ${escapeText(section[2])}</p>` : ''}
       </section>`).join('')}
@@ -191,10 +191,10 @@ function readingParagraphs(paragraphs) {
 
 async function fullReader(book, requestedSection, version) {
   if (!hostedEditions.has(book.id)) {
-    main.innerHTML = `<article class="reader"><h1>${escapeText(book.title)}</h1><p>Visit the source catalogue for this edition and its available reading formats.</p><a class="primary" href="https://www.gutenberg.org/ebooks/${book.source}" target="_blank" rel="noopener noreferrer">Open source catalogue ↗</a><a class="back" href="#book/${book.id}">← Back to the book</a></article>`;
+    main.innerHTML = `<article class="reader"><h1>${escapeText(book.title)}</h1><p>Visit the source catalogue for this edition and its available reading formats.</p><a class="primary" href="https://www.gutenberg.org/ebooks/${encodeURIComponent(book.source)}" target="_blank" rel="noopener noreferrer">Open source catalogue ↗</a><a class="back" href="#book/${escapeText(book.id)}">← Back to the book</a></article>`;
     return;
   }
-  main.innerHTML = `<a class="back" href="#book/${book.id}">← ${escapeText(book.title)}</a><article class="reader"><h1>Opening your book…</h1><p role="status">Loading the complete source edition.</p></article>`;
+  main.innerHTML = `<a class="back" href="#book/${escapeText(book.id)}">← ${escapeText(book.title)}</a><article class="reader"><h1>Opening your book…</h1><p role="status">Loading the complete source edition.</p></article>`;
   try {
     let data = fullBookCache.get(book.id);
     if (!data) {
@@ -215,15 +215,15 @@ async function fullReader(book, requestedSection, version) {
     readingProgress[book.id] = section.number;
     try { localStorage.setItem('bookstride-reading-progress', JSON.stringify(readingProgress)); }
     catch { status.textContent = 'Browser storage is unavailable. Your reading place cannot be saved.'; }
-    main.innerHTML = `<div class="reading-topbar"><a class="reading-back" href="#book/${book.id}">← Back to book</a>${readerTools()}</div><article class="reader clean-reader full-reader">
+    main.innerHTML = `<div class="reading-topbar"><a class="reading-back" href="#book/${escapeText(book.id)}">← Back to book</a>${readerTools()}</div><article class="reader clean-reader full-reader">
       <p class="reading-label">Full book · ${escapeText(book.author)}</p><h1>${escapeText(book.title)}</h1>
       <div class="chapter-control"><label for="chapter-select">Reading section <span>${index + 1} of ${data.sections.length}</span></label>
-        <div class="chapter-select-wrap"><svg class="chapter-book-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 5.5c3-1 6-.5 9 1.5 3-2 6-2.5 9-1.5v14c-3-1-6-.5-9 1.5-3-2-6-2.5-9-1.5z" stroke-linejoin="round"/><path d="M12 7v14"/></svg><select id="chapter-select" title="${escapeText(section.title)}">${data.sections.map(chapter => `<option value="${chapter.number}" ${section.number === chapter.number ? 'selected' : ''}>${escapeText(chapter.title)}</option>`).join('')}</select><svg class="chapter-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="chapter-select-wrap"><svg class="chapter-book-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 5.5c3-1 6-.5 9 1.5 3-2 6-2.5 9-1.5v14c-3-1-6-.5-9 1.5-3-2-6-2.5-9-1.5z" stroke-linejoin="round"/><path d="M12 7v14"/></svg><select id="chapter-select" title="${escapeText(section.title)}">${data.sections.map(chapter => `<option value="${escapeText(chapter.number)}" ${section.number === chapter.number ? 'selected' : ''}>${escapeText(chapter.title)}</option>`).join('')}</select><svg class="chapter-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
       <section class="full-section">${section.title.startsWith('Reading part ') ? '' : `<h2>${escapeText(section.title)}</h2>`}${readingParagraphs(section.paragraphs)}</section>
       <nav class="chapter-navigation" aria-label="Reading sections">
-        ${index > 0 ? `<a class="secondary" href="#read/${book.id}/${data.sections[index - 1].number}">← Previous section</a>` : '<span></span>'}
-        ${index < data.sections.length - 1 ? `<a class="primary" href="#read/${book.id}/${data.sections[index + 1].number}">Next section →</a>` : `<a class="primary" href="#lessons/${book.id}">Reflect on the book →</a>`}
+        ${index > 0 ? `<a class="secondary" href="#read/${escapeText(book.id)}/${escapeText(data.sections[index - 1].number)}">← Previous section</a>` : '<span></span>'}
+        ${index < data.sections.length - 1 ? `<a class="primary" href="#read/${escapeText(book.id)}/${escapeText(data.sections[index + 1].number)}">Next section →</a>` : `<a class="primary" href="#lessons/${escapeText(book.id)}">Reflect on the book →</a>`}
       </nav>
     </article>`;
     document.querySelector('#chapter-select').addEventListener('change', event => {
@@ -232,7 +232,7 @@ async function fullReader(book, requestedSection, version) {
     document.querySelector('#main').focus({preventScroll: true});
   } catch {
     if (version !== renderVersion) return;
-    main.innerHTML = `<article class="reader"><h1>We couldn’t open that edition.</h1><p>Reconnect and try again. You can save a copy from the book page while online.</p><a class="primary" href="#book/${book.id}">Back to the book</a></article>`;
+    main.innerHTML = `<article class="reader"><h1>We couldn’t open that edition.</h1><p>Reconnect and try again. You can save a copy from the book page while online.</p><a class="primary" href="#book/${escapeText(book.id)}">Back to the book</a></article>`;
   }
 }
 
