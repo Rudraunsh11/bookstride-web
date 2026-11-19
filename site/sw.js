@@ -1,9 +1,10 @@
-// Bump the shell cache when shipping changes to the interface or catalog.
-const shellCache = 'bookstride-shell-public-01e4fb72e948';
+// Bump the shell cache when shipping changes to the interface or catalog, so
+// the offline copy is refreshed. Online visitors always receive the latest page.
+const shellCache = 'bookstride-shell-public-2026-11-19a';
 const offlineBooksCache = 'bookstride-offline-books-v1';
 const shellPaths = [
   'index.html', 'style.css?v=30', 'catalog.js?v=9', 'catalog-extra.js?v=13',
-  'catalog-expanded.js?v=26', 'editions.js', 'install.js?v=27', 'app.js?v=27',
+  'catalog-expanded.js?v=26', 'editions.js', 'install.js?v=27', 'app.js?v=28',
   'developer-card.js?v=13', 'manifest.json', 'assets/parchment.svg',
   'assets/bookstride.svg', 'assets/app-192.png', 'assets/app-512.png'
 ];
@@ -32,7 +33,13 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET' || url.origin !== scope.origin || !url.pathname.startsWith(scope.pathname)) return;
   const relativePath = url.pathname.slice(scope.pathname.length);
   if (request.mode === 'navigate' && ['', 'index.html'].includes(relativePath)) {
-    event.respondWith(caches.match(indexUrl, {cacheName: shellCache}).then(response => response || fetch(request)));
+    // Network first, so a new release reaches online visitors even if the
+    // shell cache name was not bumped. The cached page is the offline fallback;
+    // it is not overwritten, because it must keep matching the cached assets.
+    event.respondWith(fetch(request).then(response => {
+      if (response.ok) return response;
+      return caches.match(indexUrl, {cacheName: shellCache}).then(cached => cached || response);
+    }).catch(async () => await caches.match(indexUrl, {cacheName: shellCache}) || Response.error()));
   } else if (shellUrls.has(url.href)) {
     event.respondWith(caches.match(request, {cacheName: shellCache}).then(response => response || fetch(request)));
   } else if (/^books\/[a-z]+\.json$/.test(relativePath) && request.cache !== 'reload') {
